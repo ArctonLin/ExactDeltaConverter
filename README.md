@@ -1,5 +1,9 @@
 # Exact Delta Converter
+ 
+**Notice** DO NOT LISTEN ExactDelta WHILE DRIVING.
 
+Please use stereo headphone and turn off any audio enhancment such like Dolby Atmos.
+ 
 A desktop application that allows you to independently shift the frequency (Hz) of the left and right audio channels, with additional features for stereo downmixing. 
 
 ## Requirements
