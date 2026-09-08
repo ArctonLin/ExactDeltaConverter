@@ -1,6 +1,6 @@
 # Exact Delta Converter
  
-**Notice** DO NOT LISTEN ExactDelta WHILE DRIVING.
+<h2 align="center"><span style="color:red">⚠️ Notice: DO NOT LISTEN ExactDelta WHILE DRIVING. ⚠️</span></h2>
 
 Please use stereo headphone and turn off any audio enhancment such like Dolby Atmos.
  
