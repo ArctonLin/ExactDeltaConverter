@@ -6,6 +6,8 @@
 
 ## Overview
 
+![Application UI](application_ui.png)
+
 Exact Delta Converter is a unique binaural beat generator that **does not add any artificial tones or background sounds** to your audio. Instead, it directly alters the frequency spectrum of the original audio file. 
 
 By independently shifting the frequencies of the left and right channels by a specific target Hz, it creates a binaural beat using the music itself. This means you can listen to your favorite songs while experiencing the benefits of binaural beats, whether for deep sleep, relaxation, or peak focus.
