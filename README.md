@@ -17,6 +17,32 @@ The application achieves this pure frequency shift using the **Hilbert Transform
 2. It shifts the entire frequency spectrum uniformly without affecting the playback speed or tempo.
 3. This creates a precise Hz difference (Delta) between the left and right ears, forming the binaural beat.
 
+## Brainwave Frequencies & Effects
+
+Binaural beats utilize a concept called **brainwave entrainment**. When you hear two slightly different frequencies in each ear, your brain perceives a third tone (the binaural beat) that equals the difference between the two. Your brainwaves naturally begin to synchronize with this difference frequency, allowing you to guide your mental state.
+
+Based on the presets available in the application, here are the different brainwave spectrums and their associated effects:
+
+- **Delta (0.5Hz - 4.0Hz)**
+  - **Effects**: Deep Sleep, Healing, Loss of bodily awareness.
+  - **App Presets**: `0.5Hz`, `2.0Hz`, `3.2Hz`
+
+- **Theta (4.0Hz - 8.0Hz)**
+  - **Effects**: Light Sleep, Deep Meditation, Creativity, REM sleep.
+  - **App Presets**: `4.0Hz`
+
+- **Alpha (8.0Hz - 12.0Hz)**
+  - **Effects**: Relaxed, Awake, Light Meditation, Calm focus.
+  - **App Presets**: `11.76Hz`
+
+- **Beta (12.0Hz - 30.0Hz)**
+  - **Effects**: Active, Awake, Thinking, Problem-solving, Concentration.
+  - **App Presets**: `15.68Hz`
+
+- **Gamma (30.0Hz - 100.0Hz)**
+  - **Effects**: High/Peak Focus, Cognitive enhancement, Heightened perception.
+  - **App Presets**: `40.0Hz`
+
 ## Quick Start
 
 ### 1. Install Requirements
