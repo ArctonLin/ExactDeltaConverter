@@ -9,12 +9,69 @@ from pathlib import Path
 from pydub import AudioSegment
 import pydub
 
+EXACT_DELTA_PRESETS = {
+    "1. Relaxation (7.83 Hz | LrRd | Schumann Resonance)": {
+        "tag": "Relax",
+        "hz": 7.83,
+        "hz_display": "7.83 (Schumann 7.83Hz - Relaxation)",
+        "mode": "left rising half + right decreasing half",
+        "mode_code": "LrRd",
+        "safety": "[AWAKE SAFE]",
+        "desc": "Right hemisphere stimulation: Schumann 7.83Hz, mind grounding, HRV harmony & full relaxation."
+    },
+    "2. Focus (15.68 Hz | LdRr | Low-Mid Beta)": {
+        "tag": "Focus",
+        "hz": 15.68,
+        "hz_display": "15.68 (Low-Mid Beta 15.68Hz - Focus)",
+        "mode": "left decreasing half + right rising half",
+        "mode_code": "LdRr",
+        "safety": "[DRIVING IDEAL]",
+        "desc": "Left hemisphere stimulation: Low-Mid Beta 15.68Hz, drives DLPFC attention, logic & working memory."
+    },
+    "3. Meditation (4.32 Hz | LrRd | 432Hz Harmonic)": {
+        "tag": "Meditation",
+        "hz": 4.32,
+        "hz_display": "4.32 (Low Theta 4.32Hz - Meditation, 432Hz Harmonic)",
+        "mode": "left rising half + right decreasing half",
+        "mode_code": "LrRd",
+        "safety": "[PARKED / PASSENGER ONLY]",
+        "desc": "Right hemisphere stimulation: Deep Theta 4.32Hz (432Hz 1% harmonic), inner insight & contemplation."
+    },
+    "4. Sleep Aid (1.96 Hz | LrRd | Upper Delta)": {
+        "tag": "SleepAid",
+        "hz": 1.96,
+        "hz_display": "1.96 (Upper Delta 1.96Hz - Sleep Aid)",
+        "mode": "left rising half + right decreasing half",
+        "mode_code": "LrRd",
+        "safety": "[DO NOT LISTEN WHILE DRIVING - PARKED NAP ONLY]",
+        "desc": "Right hemisphere stimulation: Upper Delta 1.96Hz (AASM N3 limit), closes thalamic gate for sleep."
+    },
+    "5. Deep Sleep (0.75 Hz | LrRd | Slow Oscillation)": {
+        "tag": "DeepSleep",
+        "hz": 0.75,
+        "hz_display": "0.75 (Slow Oscillation 0.75Hz - Deep Sleep, Repair)",
+        "mode": "left rising half + right decreasing half",
+        "mode_code": "LrRd",
+        "safety": "[DO NOT LISTEN WHILE DRIVING - SLEEP ONLY]",
+        "desc": "Right hemisphere stimulation: Nature cortical slow oscillation 0.75Hz, glymphatic detox & repair."
+    },
+    "6. Stress Relief (11.76 Hz | LdRr | Upper Alpha)": {
+        "tag": "StressRelief",
+        "hz": 11.76,
+        "hz_display": "11.76 (Upper Alpha 11.76Hz - Stress Relief)",
+        "mode": "left decreasing half + right rising half",
+        "mode_code": "LdRr",
+        "safety": "[COMMUTE IDEAL]",
+        "desc": "Left hemisphere stimulation: Upper Alpha 11.76Hz, boosts left PFC emotional resilience against anxiety."
+    }
+}
+
 class ExactDeltaConverterApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Exact Delta Converter")
-        self.root.geometry("800x650")
-        self.root.minsize(800, 600)
+        self.root.geometry("850x720")
+        self.root.minsize(800, 650)
 
         self.files_to_process = {}
         self.stop_requested = False
@@ -26,24 +83,37 @@ class ExactDeltaConverterApp:
         settings_frame = tk.LabelFrame(self.root, text="Settings", padx=10, pady=10)
         settings_frame.pack(fill="x", padx=10, pady=10)
 
+        # ExactDelta Preset
+        tk.Label(settings_frame, text="ExactDelta Preset:").grid(row=0, column=0, sticky="w", pady=5)
+        default_preset_key = "1. Relaxation (7.83 Hz | LrRd | Schumann Resonance)"
+        self.preset_var = tk.StringVar(value=default_preset_key)
+        preset_values = list(EXACT_DELTA_PRESETS.keys()) + ["Custom Mode"]
+        self.preset_cb = ttk.Combobox(settings_frame, textvariable=self.preset_var, values=preset_values, state="readonly", width=55)
+        self.preset_cb.grid(row=0, column=1, sticky="w", pady=5)
+
+        # Preset Info / Safety badge
+        self.preset_info_label = tk.Label(settings_frame, text="", anchor="w", justify="left", font=("Segoe UI", 9, "bold"), wraplength=650)
+        self.preset_info_label.grid(row=1, column=0, columnspan=2, sticky="w", padx=5, pady=(0, 5))
+
         # Target Hz
-        tk.Label(settings_frame, text="Target Hz:").grid(row=0, column=0, sticky="w", pady=5)
-        self.target_hz_var = tk.StringVar(value="4.0 (Theta 4hz-8hz - Light Sleep, Deep Meditation)")
+        tk.Label(settings_frame, text="Target Hz:").grid(row=2, column=0, sticky="w", pady=5)
+        self.target_hz_var = tk.StringVar(value=EXACT_DELTA_PRESETS[default_preset_key]["hz_display"])
         self.target_hz_presets = [
-            "0.5 (Delta 0.5hz-4.0hz - Deep Sleep)",
-            "2.0 (Delta 0.5hz-4.0hz - Deep Sleep)",
-            "3.2 (Delta 0.5hz-4.0hz - Deep Sleep)",
+            "7.83 (Schumann 7.83Hz - Relaxation)",
+            "15.68 (Low-Mid Beta 15.68Hz - Focus)",
+            "4.32 (Low Theta 4.32Hz - Meditation, 432Hz Harmonic)",
+            "1.96 (Upper Delta 1.96Hz - Sleep Aid)",
+            "0.75 (Slow Oscillation 0.75Hz - Deep Sleep, Repair)",
+            "11.76 (Upper Alpha 11.76Hz - Stress Relief)",
             "4.0 (Theta 4hz-8hz - Light Sleep, Deep Meditation)", 
-            "11.76 (Alpha 8hz-12hz - Relaxed, Awake, Light Meditation)", 
-            "15.68 (Beta 12hz-30hz - Active, Awake, Thinking)",
             "40.0 (Gamma 30hz-100hz - High/Peak Focus)"
         ]
-        self.target_hz_cb = ttk.Combobox(settings_frame, textvariable=self.target_hz_var, values=self.target_hz_presets, width=50)
-        self.target_hz_cb.grid(row=0, column=1, sticky="w", pady=5)
+        self.target_hz_cb = ttk.Combobox(settings_frame, textvariable=self.target_hz_var, values=self.target_hz_presets, width=55)
+        self.target_hz_cb.grid(row=2, column=1, sticky="w", pady=5)
 
         # Delta Mode
-        tk.Label(settings_frame, text="Delta Mode:").grid(row=1, column=0, sticky="w", pady=5)
-        self.delta_mode_var = tk.StringVar()
+        tk.Label(settings_frame, text="Delta Mode:").grid(row=3, column=0, sticky="w", pady=5)
+        self.delta_mode_var = tk.StringVar(value=EXACT_DELTA_PRESETS[default_preset_key]["mode"])
         self.delta_modes = [
             "left keep + right rising",
             "left keep + right decreasing",
@@ -52,32 +122,31 @@ class ExactDeltaConverterApp:
             "left rising half + right decreasing half",
             "left decreasing half + right rising half"
         ]
-        self.delta_mode_cb = ttk.Combobox(settings_frame, textvariable=self.delta_mode_var, values=self.delta_modes, state="readonly", width=50)
-        self.delta_mode_cb.current(4) # default to left rising half + right decreasing half
-        self.delta_mode_cb.grid(row=1, column=1, sticky="w", pady=5)
+        self.delta_mode_cb = ttk.Combobox(settings_frame, textvariable=self.delta_mode_var, values=self.delta_modes, state="readonly", width=55)
+        self.delta_mode_cb.grid(row=3, column=1, sticky="w", pady=5)
 
         # Stereo Percentage
-        tk.Label(settings_frame, text="Stereo Percentage:").grid(row=2, column=0, sticky="w", pady=5)
+        tk.Label(settings_frame, text="Stereo Percentage:").grid(row=4, column=0, sticky="w", pady=5)
         self.stereo_pct_var = tk.StringVar()
         self.stereo_pcts = ["100%", "75%", "50%", "25%", "0%"]
         self.stereo_pct_cb = ttk.Combobox(settings_frame, textvariable=self.stereo_pct_var, values=self.stereo_pcts, state="readonly", width=10)
         self.stereo_pct_cb.current(0) # default to 100%
-        self.stereo_pct_cb.grid(row=2, column=1, sticky="w", pady=5)
+        self.stereo_pct_cb.grid(row=4, column=1, sticky="w", pady=5)
 
         # Target Format
-        tk.Label(settings_frame, text="Target Format:").grid(row=3, column=0, sticky="w", pady=5)
+        tk.Label(settings_frame, text="Target Format:").grid(row=5, column=0, sticky="w", pady=5)
         self.target_format_var = tk.StringVar(value="Same")
         self.target_format_cb = ttk.Combobox(settings_frame, textvariable=self.target_format_var, values=["Same", "flac", "mp3", "wav"], state="readonly", width=10)
-        self.target_format_cb.grid(row=3, column=1, sticky="w", pady=5)
+        self.target_format_cb.grid(row=5, column=1, sticky="w", pady=5)
 
         # Target Bitrate
-        tk.Label(settings_frame, text="Target Bitrate:").grid(row=4, column=0, sticky="w", pady=5)
+        tk.Label(settings_frame, text="Target Bitrate:").grid(row=6, column=0, sticky="w", pady=5)
         self.target_bitrate_var = tk.StringVar(value="Same")
         self.target_bitrate_cb = ttk.Combobox(settings_frame, textvariable=self.target_bitrate_var, values=["Same", "64kbps", "128kbps", "256kbps", "320kbps"], state="readonly", width=10)
-        self.target_bitrate_cb.grid(row=4, column=1, sticky="w", pady=5)
+        self.target_bitrate_cb.grid(row=6, column=1, sticky="w", pady=5)
 
         # Max Threads
-        tk.Label(settings_frame, text="Max Threads:").grid(row=5, column=0, sticky="w", pady=5)
+        tk.Label(settings_frame, text="Max Threads:").grid(row=7, column=0, sticky="w", pady=5)
         self.thread_count_var = tk.StringVar()
         cores = os.cpu_count()
         max_threads = cores if cores else 4
@@ -85,7 +154,46 @@ class ExactDeltaConverterApp:
         self.thread_count_cb = ttk.Combobox(settings_frame, textvariable=self.thread_count_var, values=self.thread_counts, state="readonly", width=10)
         default_threads = min(4, max_threads)
         self.thread_count_cb.set(str(default_threads))
-        self.thread_count_cb.grid(row=5, column=1, sticky="w", pady=5)
+        self.thread_count_cb.grid(row=7, column=1, sticky="w", pady=5)
+
+        # Preset & Custom Synchronization callbacks
+        def on_preset_selected(event=None):
+            selected = self.preset_var.get()
+            if selected in EXACT_DELTA_PRESETS:
+                p = EXACT_DELTA_PRESETS[selected]
+                self.target_hz_var.set(p["hz_display"])
+                self.delta_mode_var.set(p["mode"])
+                color = "#d32f2f" if "DO NOT LISTEN" in p["safety"] else ("#e65100" if "PARKED" in p["safety"] else "#2e7d32")
+                self.preset_info_label.config(text=f"{p['safety']} | {p['desc']}", fg=color)
+            else:
+                self.preset_info_label.config(text="Custom Frequency & Delta Mode", fg="#555555")
+
+        def on_custom_change(event=None):
+            current_mode = self.delta_mode_var.get()
+            try:
+                current_hz = float(self.target_hz_var.get().strip().split()[0])
+            except (ValueError, IndexError):
+                current_hz = None
+            
+            matched = False
+            if current_hz is not None:
+                for name, p in EXACT_DELTA_PRESETS.items():
+                    if abs(current_hz - p["hz"]) < 0.001 and current_mode == p["mode"]:
+                        self.preset_var.set(name)
+                        color = "#d32f2f" if "DO NOT LISTEN" in p["safety"] else ("#e65100" if "PARKED" in p["safety"] else "#2e7d32")
+                        self.preset_info_label.config(text=f"{p['safety']} | {p['desc']}", fg=color)
+                        matched = True
+                        break
+            if not matched:
+                self.preset_var.set("Custom Mode")
+                self.preset_info_label.config(text="Custom Frequency & Delta Mode", fg="#555555")
+
+        self.preset_cb.bind("<<ComboboxSelected>>", on_preset_selected)
+        self.target_hz_cb.bind("<<ComboboxSelected>>", on_custom_change)
+        self.target_hz_cb.bind("<KeyRelease>", on_custom_change)
+        self.delta_mode_cb.bind("<<ComboboxSelected>>", on_custom_change)
+
+        on_preset_selected()
 
         # File List Frame
         list_frame = tk.LabelFrame(self.root, text="Files", padx=10, pady=10)
@@ -172,6 +280,12 @@ class ExactDeltaConverterApp:
         self.start_conversion(self.files_to_process)
 
     def start_conversion(self, file_list):
+        try:
+            _ = float(self.target_hz_var.get().strip().split()[0])
+        except (ValueError, IndexError):
+            messagebox.showerror("Error", "Invalid Target Hz value. Please enter a valid number (e.g. 7.83).")
+            return
+
         self.stop_requested = False
         # Disable buttons during processing
         for widget in self.root.winfo_children():
@@ -190,10 +304,18 @@ class ExactDeltaConverterApp:
         thread.start()
 
     def process_files(self, file_list):
-        target_hz = float(self.target_hz_var.get().split()[0])
+        target_hz = float(self.target_hz_var.get().strip().split()[0])
         mode = self.delta_mode_var.get()
         stereo_pct_str = self.stereo_pct_var.get()
         stereo_pct = float(stereo_pct_str.replace('%', '')) / 100.0
+
+        # Check active preset tag
+        selected_preset = self.preset_var.get()
+        preset_tag = None
+        if selected_preset in EXACT_DELTA_PRESETS:
+            p = EXACT_DELTA_PRESETS[selected_preset]
+            if abs(target_hz - p["hz"]) < 0.001 and mode == p["mode"]:
+                preset_tag = p["tag"]
 
         # Determine shifts and mode_code based on mode
         l_shift = 0.0
@@ -244,7 +366,7 @@ class ExactDeltaConverterApp:
                 
             update_status(item_id, file_path, "Processing")
             try:
-                status, out_dir = self.process_single_file(file_path, l_shift, r_shift, stereo_pct, mode_code, stereo_code, target_hz)
+                status, out_dir = self.process_single_file(file_path, l_shift, r_shift, stereo_pct, mode_code, stereo_code, target_hz, preset_tag)
                 if status == "SKIPPED":
                     update_status(item_id, file_path, "Skipped")
                 else:
@@ -300,13 +422,14 @@ class ExactDeltaConverterApp:
                     
         self.root.after(0, reenable)
 
-    def process_single_file(self, file_path, l_shift, r_shift, stereo_pct, mode_code, stereo_code, target_hz):
+    def process_single_file(self, file_path, l_shift, r_shift, stereo_pct, mode_code, stereo_code, target_hz, preset_tag=None):
         # Determine output path first to allow skipping
         path_obj = Path(file_path)
         parent_dir = path_obj.parent
         
         hz_str = f"{target_hz}hz" if target_hz % 1 != 0 else f"{int(target_hz)}hz"
-        new_dir_name = f"ExactDelta_{hz_str}_{mode_code}_{stereo_code}_{parent_dir.name}"
+        prefix = f"ExactDelta-{preset_tag}_" if preset_tag else "ExactDelta_"
+        new_dir_name = f"{prefix}{hz_str}_{mode_code}_{stereo_code}_{parent_dir.name}"
         new_dir_path = parent_dir.parent / new_dir_name
         
         ext = path_obj.suffix.lower().strip('.')
@@ -319,7 +442,7 @@ class ExactDeltaConverterApp:
             if ext in ["aac", "m4a", "wma", "opus"]:
                 target_format = "mp3"
                 
-        new_filename = f"ExactDelta_{hz_str}_{mode_code}_{stereo_code}_{path_obj.stem}.{target_format}"
+        new_filename = f"{prefix}{hz_str}_{mode_code}_{stereo_code}_{path_obj.stem}.{target_format}"
         out_path = new_dir_path / new_filename
         
         if out_path.exists():
